@@ -3,16 +3,43 @@ import todos from './data/todos';
 
 export default {
   data() {
+    let todos = [];
+    const jsonData = localStorage.getItem('todos') || '[]';
+  
+    try {
+      todos = JSON.parse(jsonData);
+    } catch (err) {}
+
     return {
       todos,
+      title : '',
     }
   },
-  mounted() {
-    console.log(this.todos);
-  },
+  // mounted() {
+  //   // console.log(this.todos);
+  // },
   computed: {
     activeTodos() {
       return this.todos.filter(todo => !todo.completed)
+    }
+  },
+  watch: {
+    todos: {
+      deep: true,
+      handler() {
+        localStorage.setItem('todos', JSON.stringify(this.todos));
+      },
+    }
+  },
+  methods: {
+    handleSubmit() {
+      this.todos.push({
+        id: Date.now(),
+        title: this.title,
+        completed: false,
+      });
+
+      this.title = '';
     }
   }
 }
@@ -26,11 +53,12 @@ export default {
         <header class="todoapp__header">
           <button type="button" class="todoapp__toggle-all" :class="{ active: !activeTodos.length}" />
 
-          <form>
+          <form @submit.prevent="handleSubmit">
             <input
               type="text"
               class="todoapp__new-todo"
               placeholder="What needs to be done?"
+              v-model="title"
             />
           </form>
         </header>
