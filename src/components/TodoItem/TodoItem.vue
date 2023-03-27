@@ -2,13 +2,13 @@
 export default {
   name: 'TodoItem',
   props: {
-    todo: Object
+    todo: Object,
   },
   emits: ['update', 'delete'],
   data() {
     return {
       editing: false,
-      newTitle: this.todo.title
+      newTitle: this.todo.title,
     };
   },
   methods: {
@@ -20,27 +20,20 @@ export default {
     },
     rename() {
       if (!this.editing) {
-        return
-      };
-
-      this.editing = false;
-
-      if (this.newTitle === this.todo.title) {
-        return
-      }
-
-      if (!this.newTitle.length) {
-        this.remove();
-
         return;
       }
-
+      this.editing = false;
+      if (this.newTitle === this.todo.title) {
+        return;
+      }
+      if (this.newTitle === '') {
+        this.remove();
+        return;
+      }
       this.$emit('update', {
         ...this.todo,
         title: this.newTitle,
       });
-
-      this.newTitle = '';
     },
     remove() {
       this.$emit('delete');
@@ -50,18 +43,14 @@ export default {
       this.editing = true;
       this.$nextTick(() => {
         this.$refs['title-field'].focus();
-      })
-      
+      });
     }
-  }
-}
+  },
+};
 </script>
 
 <template>
-  <div 
-    class="todo"
-    :class="{ completed: todo.completed }"
-  >
+  <div class="todo" :class="{ completed: todo.completed }">
     <label class="todo__status-label">
       <input
         type="checkbox"
@@ -75,6 +64,7 @@ export default {
       <input
         type="text"
         class="todo__title-field"
+        placeholder="Empty todo will be deleted"
         v-model.trim="newTitle"
         ref="title-field"
         @keyup.esc="editing = false"
@@ -83,20 +73,21 @@ export default {
     </form>
 
     <template v-else>
-      <span class="todo__title" @dblclick="edit">{{ todo.title }}</span>
+      <span class="todo__title" @dblclick="edit">
+        {{ todo.title }}
+      </span>
 
-      <button 
-        type="button" 
-        class="todo__remove" 
+      <button
+        class="todo__remove"
         @click="remove"
       >
-        ×
+        x
       </button>
     </template>
 
     <div class="modal overlay" :class="{ 'is-active': false }">
-      <div class="modal-background has-background-white-ter" />
-      <div class="loader" />
+      <div class="modal-background has-background-white-ter"></div>
+      <div class="loader"></div>
     </div>
   </div>
 </template>
